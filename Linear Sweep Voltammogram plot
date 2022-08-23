@@ -1,0 +1,20 @@
+import matplotlib.pyplot as plt
+import numpy as np
+import pandas as pd
+df = pd.read_excel('ORRXL.xlsx')
+plt.figure(figsize=(8,5))
+
+
+plt.plot(df.orrva,df.rpm100 * 1000 / 0.1256)
+plt.plot(df.orrva,df.rpm200 * 1000 / 0.1256)
+plt.plot(df.orrva,df.rpm400 * 1000 / 0.1256)
+plt.plot(df.orrva,df.rpm800 * 1000 / 0.1256)
+plt.plot(df.orrva,df.rpm1600 * 1000 / 0.1256)
+
+plt. legend(['100', '200', '400', '800', '1600'])
+plt.title('LSV_TEC10E50E-LHT PCA', fontdict={'fontname': 'Arial', 'fontsize': 14})
+plt.xlabel('Potential / V vs. RHE', fontdict={'fontname': 'Arial', 'fontsize': 12})
+plt.ylabel('Current (mA/cm2)', fontdict={'fontname': 'Arial', 'fontsize': 12})
+plt.savefig('LSV.png', dpi=300)
+plt.show()
+

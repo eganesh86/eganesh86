@@ -1,0 +1,95 @@
+import numpy as np
+import matplotlib.pyplot as plt
+
+
+def plot_gpr_samples(gpr_model, n_samples, ax):
+    x = np.linspace(-0.1, 9.1, 500)
+    X = x.reshape(-1, 1)
+
+    y_mean, y_std = gpr_model.predict(X, return_std=True)
+    y_samples = gpr_model.sample_y(X, n_samples)
+
+    for idx, single_prior in enumerate(y_samples.T):
+        ax.plot(
+            x,
+            single_prior,
+            linestyle="--",
+            alpha=0.7,
+            label=f"Sampled function #{idx + 1}",
+        )
+    ax.plot(x, y_mean, color="black", label="Mean")
+    ax.fill_between(
+        x,
+        y_mean - y_std,
+        y_mean + y_std,
+        alpha=0.1,
+        color="black",
+        label=r"$\pm$ 1 std. dev.",
+    )
+    ax.set_xlabel("Input, x", fontsize=20)
+    ax.set_ylabel("Output, y", fontsize=20)
+    #ax.set_ylim([0.0, 0.2])
+    return
+
+
+y_train = np.array([
+    0.104015675,
+    0.144070103,
+    0.117291031,
+    0.117286493,
+    0.096204599,
+    0.141012625,
+    0.114575414,
+    0.12623851,
+    0.120357984,
+    0.109405513,
+])
+
+error = [0.00134765,
+0.00319853,
+0.002322823,
+0.000630938,
+0.003041601,
+0.00166203,
+0.001554742,
+0.00177952,
+0.003044584,
+0.00330258
+]
+
+rng = np.random.RandomState(4)
+x_values = np.arange(0, 10)
+X_train = np.array(x_values).reshape(-1, 1)
+y_train = y_train[:]
+
+n_samples = 3
+
+from sklearn.gaussian_process import GaussianProcessRegressor
+from sklearn.gaussian_process.kernels import RBF
+
+kernel = 1.0 * RBF(length_scale=1.0, length_scale_bounds=(1e-1, 10.0))
+gpr = GaussianProcessRegressor(kernel=kernel, random_state=0)
+
+fig, axs = plt.subplots(nrows=1, sharex=True, sharey=True, figsize=(10, 8))
+
+# plot posterior
+gpr.fit(X_train, y_train)
+plot_gpr_samples(gpr, n_samples=n_samples, ax=axs)
+axs.scatter(X_train[:, 0],
+            y_train,
+            color="b",
+            s=100,
+            marker='s',
+            zorder=10,
+            alpha = 0.5,
+            label="Observations")
+axs.errorbar(X_train[:, 0],  y_train, yerr = error,  fmt = 'o',
+             label ='error', elinewidth = 1, capsize=5)
+axs.legend(loc='best', fontsize=14
+           )  
+x_ticklabels = ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j']
+plt.xticks(ticks=x_values, labels=x_ticklabels, fontsize=18)
+plt.yticks(fontsize=14)
+
+fig.suptitle("Here kernel is based on Radial Basis Function", fontsize=18)
+plt.tight_layout()
